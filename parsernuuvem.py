@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import csv
 
-page = requests.get("https://www.nuuvem.com/catalog/price/promo/sort/bestselling/sort-mode/desc")
+page = requests.get("https://www.nuuvem.com/catalog/price/promo/sort/bestselling/sort-mode/desc/page/:page.html")
 
 soup = BeautifulSoup(page.content, 'html.parser')
 
