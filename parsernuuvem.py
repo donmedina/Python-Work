@@ -3,24 +3,37 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import csv
 
-page = requests.get("https://www.nuuvem.com/catalog/price/promo/sort/bestselling/sort-mode/desc/page/:page.html")
 
-soup = BeautifulSoup(page.content, 'html.parser')
+page_principal = requests.get("https://www.nuuvem.com/catalog/price/promo/sort/bestselling/sort-mode/desc")
 
-ofertas = soup.find(class_="products-dock--main nvm-mod mod-group-sell mod-group-sell-offer")
-nome_oferta = [no.get_text() for no in ofertas.select(".product-title")]
-valor_integer = [vi.get_text() for vi in ofertas.select(".integer")]
-valor_decimal = [vd.get_text() for vd in ofertas.select(".decimal")]
+soup_principal = BeautifulSoup(page_principal.content, 'html.parser')
 
-columnsTitle = ['title','integer','decimal']
+paginas = soup_principal.findAll('section',{"data-pager":True} )
+for data in paginas:
+    conteudo = data['data-pager']
 
-lista_oferta = pd.DataFrame({
-    'title': nome_oferta,
-    'integer': valor_integer,
-    'decimal': valor_decimal
+total_paginas = int(conteudo[32]) + 1
+contador = 1
 
-}, columns=columnsTitle)
+lo = pd.DataFrame()
 
-print(lista_oferta)
+for contador in range(1,total_paginas):
+    page_unica = requests.get("https://www.nuuvem.com/catalog/price/promo/sort/bestselling/sort-mode/desc/page/%s" %contador)
+    soup = BeautifulSoup(page_unica.content, 'html.parser')
+    ofertas = soup.find(class_="products-dock--main nvm-mod mod-group-sell mod-group-sell-offer")
+    nome_oferta = [no.get_text() for no in ofertas.select(".product-title")]
+    valor_integer = [vi.get_text() for vi in ofertas.select(".integer")]
+    valor_decimal = [vd.get_text() for vd in ofertas.select(".decimal")]
 
-lista_oferta.to_excel("lista.xlsx")
+    columnsTitle = ['title','integer','decimal']
+
+    lista_oferta = pd.DataFrame({
+        'title': nome_oferta,
+        'integer': valor_integer,
+        'decimal': valor_decimal
+
+    }, columns=columnsTitle)
+
+    lo = lo.append(lista_oferta)
+print(lo)
+lo.to_csv("ofertas.csv")
