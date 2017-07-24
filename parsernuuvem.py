@@ -35,5 +35,6 @@ for contador in range(1,total_paginas):
     }, columns=columnsTitle)
 
     lo = lo.append(lista_oferta)
+
 print(lo)
-lo.to_csv("ofertas.csv")
+lo.to_excel("ofertas.xlsx")
